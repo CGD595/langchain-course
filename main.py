@@ -8,9 +8,20 @@ from langchain.agents.react.agent import create_react_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_tavily import TavilySearch
 
-def main():
-    print("Hello from langchain-course!")
+tools = [TavilySearch()]
+llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-1.5-flash")
+react_prompt = hub.pull("hwchase17/react")
+agent = create_react_agent(llm, tools, prompt=react_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+chain = agent_executor
 
+def main():
+    result = chain.invoke(
+        input={
+            "input":"What is the weather right now in Thimphu, Bhutan?"
+        }
+    )
+    print(result)
 
 if __name__ == "__main__":
     main()
